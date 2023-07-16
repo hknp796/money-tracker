@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from 'react';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import './App.css';
 
 function App() {
@@ -57,13 +58,12 @@ function App() {
           <input type='text'
             value={name}
             onChange={ev => setName(ev.target.value)}
-            placeholder={'+200 samsung tv'}></input>
+            placeholder={'-200 food'}></input>
           <input
             value={datetime}
             onChange={ev => setDateTime
               (ev.target.value)} type='datetime-local'></input>
         </div>
-
         <div className='description'>
           <input type='text'
             value={description}
@@ -86,6 +86,11 @@ function App() {
             <div className='right'>
               <div className={'price ' + (transactions.price < 0 ? 'red' : 'green')} >{transactions.price}</div>
               <div className='datetime'>2022-12-18 </div>
+            <div>
+
+              <DeleteOutlinedIcon />
+
+            </div>
             </div>
           </div>
         ))}
