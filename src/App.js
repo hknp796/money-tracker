@@ -8,24 +8,26 @@ function App() {
   const [datetime, setDateTime] = useState('');
   const [description, setDescription] = useState('');
   const [transactions, setTransactions] = useState('')
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    getTransactions().then(transactions => {
-      setTransactions(transactions)
-    })
+    getTransactions()
   }, [])
 
   async function getTransactions() {
     const url = process.env.REACT_APP_API_URL + '/transactions'
     const response = await fetch(url)
-    return await response.json()
+    response.json().then((transactions)=>{
+      setTransactions(transactions)
+
+    })
   }
 
   function addNewTransaction(ev) {
     ev.preventDefault();
     const url = process.env.REACT_APP_API_URL + '/transaction'
     const price = name.split(' ')[0]
-
+    setLoading(true)
     fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -39,6 +41,21 @@ function App() {
         setDescription("");
         setTransactions([...transactions, json]);
       })
+    }).finally(() => {
+      setLoading(false)
+
+    })
+  }
+
+  function deleteItem(id) {
+    const url = process.env.REACT_APP_API_URL + '/delete'
+    fetch(url, {
+      method: 'delete',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id })
+
+    }).then(()=>{
+      getTransactions()
     })
   }
 
@@ -70,12 +87,19 @@ function App() {
             onChange={ev => setDescription(ev.target.value)}
             placeholder={'description'}></input>
         </div>
-        <button type='submit'> Add New transaction</button>
-
+        {loading ? (
+          <button type="submit">
+            <img src="/loading.gif" width={20} height={20} alt="loader" />
+          </button>
+        ) : (
+          <button type="submit">
+            <span>Add New transaction</span>
+          </button>
+        )}
       </form>
       <div className='transactions'>
         {transactions.length > 0 && transactions.map(transactions => (
-          <div className='transaction'>
+          <div className='transaction' key={transactions._id}>
             <div className='left'>
 
               <div className='name'>
@@ -84,13 +108,14 @@ function App() {
               <div className='description'>{transactions.description}</div>
             </div>
             <div className='right'>
-              <div className={'price ' + (transactions.price < 0 ? 'red' : 'green')} >{transactions.price}</div>
-              <div className='datetime'>2022-12-18 </div>
-            <div>
+              <div>
 
-              <DeleteOutlinedIcon />
-
-            </div>
+                <div className={'price ' + (transactions.price < 0 ? 'red' : 'green')} >{transactions.price}</div>
+                <div className='datetime'>2022-12-18 </div>
+              </div>
+              <div onClick={() => deleteItem(transactions._id)}>
+                <DeleteOutlinedIcon />
+              </div>
             </div>
           </div>
         ))}
